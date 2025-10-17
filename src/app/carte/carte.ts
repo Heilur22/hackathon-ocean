@@ -4,44 +4,8 @@ import * as L from 'leaflet';
 @Component({
   selector: 'app-carte',
   standalone: true,
-  template: `
-    <div class="carte-container">
-      <h1>🗺️ Ma Carte Interactive</h1>
-      <div id="map"></div>
-      <div class="info">
-        <p>Cliquez sur les marqueurs pour plus d'informations</p>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .carte-container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    #map {
-      height: 600px;
-      width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border: 2px solid #e0e0e0;
-    }
-
-    .info {
-      text-align: center;
-      margin-top: 15px;
-      color: #666;
-      font-style: italic;
-    }
-  `]
+  templateUrl: 'carte.html',
+  styleUrl: './carte.css'
 })
 export class CarteComponent implements OnInit {
   private map: any;
