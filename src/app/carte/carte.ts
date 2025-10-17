@@ -19,8 +19,16 @@ export class CarteComponent implements OnInit {
   }
 
   private initMap(): void {
-    // Initialiser la carte centrée sur la France
-    this.map = L.map('map').setView([46.603354, 1.888334], 6);
+    // Initialiser la carte
+    this.map = L.map('map');
+
+    // Définir les coordonnées de Roscoff et Locquirec
+    const roscoff: L.LatLngTuple = [48.7267, -3.9883];
+    const locquirec: L.LatLngTuple = [48.6869, -3.6469];
+
+    // Zoomer sur la zone entre Roscoff et Locquirec
+    const bounds = L.latLngBounds(roscoff, locquirec);
+    this.map.fitBounds(bounds, { padding: [50, 50] });
 
     // Ajouter le fond de carte OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -28,26 +36,21 @@ export class CarteComponent implements OnInit {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
-    // Marqueur sur Paris
-    const parisMarker = L.marker([48.8566, 2.3522]).addTo(this.map);
-    parisMarker.bindPopup('<b>Paris</b><br>Capitale de la France').openPopup();
+    // Marqueur sur Roscoff
+    const roscoffMarker = L.marker([48.7267, -3.9883]).addTo(this.map);
+    roscoffMarker.bindPopup('<b>Roscoff</b><br>Port de Bretagne').openPopup();
 
-    // Cercle sur Lyon
-    const lyonCircle = L.circle([45.764043, 4.835659], {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5,
-      radius: 50000
-    }).addTo(this.map);
-    lyonCircle.bindPopup('<b>Lyon</b><br>Deuxième ville de France');
+    // Marqueur sur Locquirec
+    const locquirecMarker = L.marker([48.6869, -3.6469]).addTo(this.map);
+    locquirecMarker.bindPopup('<b>Locquirec</b><br>Station balnéaire');
 
-    // Marqueur sur Brest
-    const brestMarker = L.marker([48.390394, -4.486076]).addTo(this.map);
-    brestMarker.bindPopup('<b>Brest</b><br>Bretagne');
+    // Marqueur sur Saint-Pol-de-Léon (entre les deux)
+    const stPolMarker = L.marker([48.6833, -3.9833]).addTo(this.map);
+    stPolMarker.bindPopup('<b>Saint-Pol-de-Léon</b><br>Ville légumière');
 
-    // Marqueur sur Marseille
-    const marseilleMarker = L.marker([43.296482, 5.36978]).addTo(this.map);
-    marseilleMarker.bindPopup('<b>Marseille</b><br>Ville portuaire');
+    // Marqueur sur Morlaix
+    const morlaixMarker = L.marker([48.5777, -3.8275]).addTo(this.map);
+    morlaixMarker.bindPopup('<b>Morlaix</b><br>Ville portuaire');
   }
 
   // Fix pour les icônes Leaflet dans Angular
