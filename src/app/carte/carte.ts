@@ -28,6 +28,13 @@ export class CarteComponent implements OnInit {
       color: '#228B22'
     },
     {
+      url: 'assets/pesticide_with_data.geojson',
+      style: { color: '#228B22', fillOpacity: 0.3 },
+      name: 'Pesticides avec données',
+      visible: true,
+      color: '#228B22'
+    },
+    {
       url: 'assets/ecoli.geojson',
       style: { color: '#FF6347', weight: 3, fillOpacity: 0 },
       name: 'Bactérie Escherichia coli',
@@ -43,9 +50,9 @@ export class CarteComponent implements OnInit {
         let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
 
         if (classValue === 'A') {
-          fillColor = '#007FFF'; // Bleu ciel
+          fillColor = '#00ff00'; // Bleu ciel
         } else if (classValue === 'B') {
-          fillColor = '#00ff00'; // Vert
+          fillColor = '#ffff00'; // Vert
         } else if (classValue === 'C') {
           fillColor = '#ffff00'; // Jaune
         }
@@ -70,9 +77,9 @@ export class CarteComponent implements OnInit {
         let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
 
         if (classValue === 'A') {
-          fillColor = '#007FFF'; // Bleu ciel
+          fillColor = '#00ff00'; // Bleu ciel
         } else if (classValue === 'B') {
-          fillColor = '#00ff00'; // Vert
+          fillColor = '#ffff00'; // Vert
         } else if (classValue === 'C') {
           fillColor = '#ffff00'; // Jaune
         }
@@ -97,9 +104,9 @@ export class CarteComponent implements OnInit {
         let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
 
         if (classValue === 'A') {
-          fillColor = '#007FFF'; // Bleu ciel
+          fillColor = '#00ff00'; // Bleu ciel
         } else if (classValue === 'B') {
-          fillColor = '#00ff00'; // Vert
+          fillColor = '#ffff00'; // Vert
         } else if (classValue === 'C') {
           fillColor = '#ffff00'; // Jaune
         }
