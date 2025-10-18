@@ -21,18 +21,12 @@ export class CarteComponent implements OnInit {
   // Configuration des couches avec visibilité
   layers: LayerConfig[] = [
     {
-      url: 'assets/pesticide.geojson',
-      style: { color: '#228B22', fillOpacity: 0.3 },
-      name: 'Pesticides',
-      visible: true,
-      color: '#228B22'
-    },
-    {
-      url: 'assets/pesticide_with_data.geojson',
+      url: 'assets/pesticide_definitive.geojson',
       style: { color: '#228B22', fillOpacity: 0.3 },
       name: 'Pesticides avec données',
       visible: true,
-      color: '#228B22'
+      color: '#228B22',
+      useCustomMarkers: true  // ⬅️ AJOUT
     },
     {
       url: 'assets/ecoli.geojson',
@@ -43,25 +37,23 @@ export class CarteComponent implements OnInit {
     },
     {
       url: 'assets/zone_morlaix.geojson',
-      // ⬇️ CHANGEMENT ICI : fonction au lieu d'objet
       style: (feature: any) => {
-        // Couleur basée sur CLASS_2023
         const classValue = feature?.properties?.CLASS_2023;
-        let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
+        let fillColor = '#ff0000';
 
         if (classValue === 'A') {
-          fillColor = '#00ff00'; // Bleu ciel
+          fillColor = '#00ff00';
         } else if (classValue === 'B') {
-          fillColor = '#ffff00'; // Vert
+          fillColor = '#ffff00';
         } else if (classValue === 'C') {
-          fillColor = '#ffff00'; // Jaune
+          fillColor = '#ffff00';
         }
 
         return {
-          color: fillColor,        // Couleur du contour
-          weight: 2,               // Épaisseur du contour
-          fillColor: fillColor,    // Couleur de remplissage
-          fillOpacity: 0.5         // Opacité du remplissage
+          color: fillColor,
+          weight: 2,
+          fillColor: fillColor,
+          fillOpacity: 0.5
         };
       },
       name: 'Zone baie de morlaix',
@@ -70,25 +62,23 @@ export class CarteComponent implements OnInit {
     },
     {
       url: 'assets/zone_locquirec.geojson',
-      // ⬇️ CHANGEMENT ICI : fonction au lieu d'objet
       style: (feature: any) => {
-        // Couleur basée sur CLASS_2023
         const classValue = feature?.properties?.GP2_2023;
-        let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
+        let fillColor = '#ff0000';
 
         if (classValue === 'A') {
-          fillColor = '#00ff00'; // Bleu ciel
+          fillColor = '#00ff00';
         } else if (classValue === 'B') {
-          fillColor = '#ffff00'; // Vert
+          fillColor = '#ffff00';
         } else if (classValue === 'C') {
-          fillColor = '#ffff00'; // Jaune
+          fillColor = '#ffff00';
         }
 
         return {
-          color: fillColor,        // Couleur du contour
-          weight: 2,               // Épaisseur du contour
-          fillColor: fillColor,    // Couleur de remplissage
-          fillOpacity: 0.5         // Opacité du remplissage
+          color: fillColor,
+          weight: 2,
+          fillColor: fillColor,
+          fillOpacity: 0.5
         };
       },
       name: 'Zone Locquirec',
@@ -97,25 +87,23 @@ export class CarteComponent implements OnInit {
     },
     {
       url: 'assets/zone_etude.geojson',
-      // ⬇️ CHANGEMENT ICI : fonction au lieu d'objet
       style: (feature: any) => {
-        // Couleur basée sur CLASS_2023
         const classValue = feature?.properties?.GP2_2023;
-        let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
+        let fillColor = '#ff0000';
 
         if (classValue === 'A') {
-          fillColor = '#00ff00'; // Bleu ciel
+          fillColor = '#00ff00';
         } else if (classValue === 'B') {
-          fillColor = '#ffff00'; // Vert
+          fillColor = '#ffff00';
         } else if (classValue === 'C') {
-          fillColor = '#ffff00'; // Jaune
+          fillColor = '#ffff00';
         }
 
         return {
-          color: fillColor,        // Couleur du contour
-          weight: 2,               // Épaisseur du contour
-          fillColor: fillColor,    // Couleur de remplissage
-          fillOpacity: 0         // Opacité du remplissage
+          color: fillColor,
+          weight: 2,
+          fillColor: fillColor,
+          fillOpacity: 0
         };
       },
       name: 'Zone d\'étude',
@@ -151,7 +139,6 @@ export class CarteComponent implements OnInit {
     this.layers.forEach(layerConfig => {
       this.http.get(layerConfig.url).subscribe({
         next: (data: any) => {
-          // Créer la couche GeoJSON directement
           const layer = L.geoJSON(data, {
             style: (feature) => {
               if (typeof layerConfig.style === 'function') {
@@ -159,26 +146,87 @@ export class CarteComponent implements OnInit {
               }
               return layerConfig.style as any;
             },
-            pointToLayer: (feature, latlng) => L.marker(latlng),
+            // ⬇️ MODIFICATION ICI
+            pointToLayer: (feature, latlng) => {
+              // Marqueurs colorés pour pesticide_with_data
+              if (layerConfig.useCustomMarkers) {
+                const valeur = feature.properties?.moyenne_Valeur_moy;
+                let markerColor = '#00ff00'; // Vert par défaut
 
-            // ✅ Désactive toute interaction si demandé
+                if (valeur > 0.2) {
+                  markerColor = '#ff0000'; // Rouge
+                } else if (valeur > 0.05) {
+                  markerColor = '#ffff00'; // Jaune
+                }
+
+                const icon = L.divIcon({
+                  className: 'custom-marker',
+                  html: `
+                    <div style="
+                      background-color: ${markerColor};
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      border: 2px solid #fff;
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                    "></div>
+                  `,
+                  iconSize: [20, 20],
+                  iconAnchor: [10, 10],
+                  popupAnchor: [0, -10]
+                });
+
+                return L.marker(latlng, { icon });
+              }
+
+              return L.marker(latlng);
+            },
+
             interactive: layerConfig.interactive !== false,
 
             onEachFeature: (feature, layer: any) => {
-              // 🚫 Ne fait rien si la couche n’est pas interactive
               if (layerConfig.interactive === false) return;
 
               if (feature.properties) {
-                // Popup standard
-                let popupContent = `<div><h3>${layerConfig.name}</h3>`;
-                for (let key in feature.properties) {
-                  popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                // ⬇️ MODIFICATION ICI - Popup enrichie pour pesticide_with_data
+                if (layerConfig.useCustomMarkers && feature.properties['Moyenne micropolluants OH — Feuil1_Valeur_moy'] !== undefined) {
+                  const valeur = feature.properties['Moyenne micropolluants OH — Feuil1_Valeur_moy'];
+                  let status = 'Bon';
+                  let statusColor = '#00ff00';
+
+                  if (valeur > 0.2) {
+                    status = 'Critique';
+                    statusColor = '#ff0000';
+                  } else if (valeur > 0.05) {
+                    status = 'Attention';
+                    statusColor = '#ffff00';
+                  }
+
+                  let popupContent = `
+                    <div style="font-family: Arial; min-width: 200px;">
+                      <h3 style="margin: 0 0 10px 0;">${layerConfig.name}</h3>
+                      <div style="background: ${statusColor}; color: #000; padding: 5px 10px; border-radius: 3px; margin-bottom: 10px; font-weight: bold;">
+                        ${status}: ${valeur.toFixed(3)} µg/L
+                      </div>`;
+
+                  for (let key in feature.properties) {
+                    if (key !== 'Moyenne micropolluants OH — Feuil1_Valeur_moy') {
+                      popupContent += `<p style="margin: 3px 0;"><b>${key}:</b> ${feature.properties[key]}</p>`;
+                    }
+                  }
+                  popupContent += '</div>';
+                  layer.bindPopup(popupContent);
+                } else {
+                  // Popup standard
+                  let popupContent = `<div><h3>${layerConfig.name}</h3>`;
+                  for (let key in feature.properties) {
+                    popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                  }
+                  popupContent += '</div>';
+                  layer.bindPopup(popupContent);
                 }
-                popupContent += '</div>';
-                layer.bindPopup(popupContent);
               }
 
-              // Effet hover uniquement si interactif
               if (
                 (feature.geometry.type === 'Polygon' ||
                   feature.geometry.type === 'MultiPolygon')
@@ -204,10 +252,8 @@ export class CarteComponent implements OnInit {
             },
           });
 
-          // Stocker la référence de la couche GeoJSON
           layerConfig.layer = layer as any;
 
-          // Ajouter à la carte si visible
           if (layerConfig.visible) {
             layer.addTo(this.map);
           }
@@ -221,7 +267,6 @@ export class CarteComponent implements OnInit {
     });
   }
 
-  // Méthode pour afficher/masquer une couche
   toggleLayer(layerConfig: LayerConfig): void {
     if (!layerConfig.layer) {
       console.warn(`⚠️ Couche ${layerConfig.name} pas encore chargée`);
