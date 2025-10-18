@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
+import {HttpClient} from '@angular/common/http';
+import {LayerConfig} from './layer-config';
 
 @Component({
   selector: 'app-carte',
@@ -8,13 +10,17 @@ import * as L from 'leaflet';
   styleUrl: './carte.css'
 })
 export class CarteComponent implements OnInit {
+
+  constructor(private http: HttpClient) {
+  }
   private map: any;
 
   ngOnInit(): void {
     // Petit délai pour s'assurer que le DOM est prêt
     setTimeout(() => {
-      this.initMap();
       this.fixLeafletIcons();
+      this.initMap();
+      this.loadGeoJSON();
     }, 100);
   }
 
@@ -35,26 +41,59 @@ export class CarteComponent implements OnInit {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
+  }
 
-    // Marqueur sur Roscoff
-    const roscoffMarker = L.marker([48.7267, -3.9883]).addTo(this.map);
-    roscoffMarker.bindPopup('<b>Roscoff</b><br>Port de Bretagne').openPopup();
+  private loadGeoJSON(): void {
+    // Liste des fichiers GeoJSON à charger
+    const geoJsonFiles = [
+      { url: 'assets/pesticide.geojson', style: { color: '#228B22', fillOpacity: 0.3 }, name: 'Pesticides' },
+      { url: 'assets/ecoli.geojson', style: { color: '#FF6347', weight: 3, fillOpacity: 0 }, name: 'Bactérie Escherichia coli' },
+    ];
 
-    // Marqueur sur Locquirec
-    const locquirecMarker = L.marker([48.6869, -3.6469]).addTo(this.map);
-    locquirecMarker.bindPopup('<b>Locquirec</b><br>Station balnéaire');
+    // Charger chaque fichier
+    geoJsonFiles.forEach(file => {
+      this.http.get(file.url).subscribe({
+        next: (data: any) => {
+          const layer = L.geoJSON(data, {
+            style: () => file.style,
+            pointToLayer: (feature, latlng) => {
+              // Crée un marker classique pour chaque Point
+              return L.marker(latlng);
+            },
+            onEachFeature: (feature, layer) => {
+              if (feature.properties) {
+                let popupContent = `<div><h3>${file.name}</h3>`;
+                for (let key in feature.properties) {
+                  popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                }
+                popupContent += '</div>';
+                layer.bindPopup(popupContent);
+              }
+            }
+          }).addTo(this.map);
 
-    // Marqueur sur Saint-Pol-de-Léon (entre les deux)
-    const stPolMarker = L.marker([48.6833, -3.9833]).addTo(this.map);
-    stPolMarker.bindPopup('<b>Saint-Pol-de-Léon</b><br>Ville légumière');
+          console.log(`✅ ${file.name} chargé avec succès`);
+        },
+        error: (error) => {
+          console.error(`❌ Erreur lors du chargement de ${file.name}:`, error);
+        }
+      });
+    });
+  }
 
-    // Marqueur sur Morlaix
-    const morlaixMarker = L.marker([48.5777, -3.8275]).addTo(this.map);
-    morlaixMarker.bindPopup('<b>Morlaix</b><br>Ville portuaire');
+  toggleLayer(layerConfig: LayerConfig): void {
+    if (!layerConfig.layer) return;
+
+    if (layerConfig.visible) {
+      layerConfig.layer.addTo(this.map);
+    } else {
+      this.map.removeLayer(layerConfig.layer);
+    }
   }
 
   // Fix pour les icônes Leaflet dans Angular
   private fixLeafletIcons(): void {
+    (L.Icon.Default as any).imagePath = 'assets/';
     const iconRetinaUrl = 'assets/marker-icon-2x.png';
     const iconUrl = 'assets/marker-icon.png';
     const shadowUrl = 'assets/marker-shadow.png';
