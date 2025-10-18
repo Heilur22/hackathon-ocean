@@ -115,12 +115,14 @@ export class CarteComponent implements OnInit {
   ];
 
   activeLegends: Array<{name: string, items: Array<{color: string, label: string, range: string}>}> = [];
+  showLayerControl: boolean = false;
 
   ngOnInit(): void {
     setTimeout(() => {
       this.fixLeafletIcons();
       this.initMap();
       this.loadGeoJSON();
+      this.updateLegends();
     }, 100);
   }
 
@@ -408,6 +410,10 @@ export class CarteComponent implements OnInit {
         }
       }
     });
+  }
+
+  toggleLayerControl(): void {
+    this.showLayerControl = !this.showLayerControl;
   }
 
 }
