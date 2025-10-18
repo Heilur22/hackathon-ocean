@@ -202,3 +202,32 @@ footer {
   font-size: 0.95rem;
   border-top: 3px solid #0288d1;
 }
+
+
+.info.legend {
+  padding: 10px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  font-family: Arial, sans-serif;
+}
+
+.info.legend h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.info.legend div {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.info.legend i {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}

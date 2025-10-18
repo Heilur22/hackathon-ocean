@@ -21,7 +21,7 @@ export class CarteComponent implements OnInit {
   // Configuration des couches avec visibilité
   layers: LayerConfig[] = [
     {
-      url: 'assets/pesticide_definitive.geojson',
+      url: 'assets/pesticide_with_data.geojson',
       style: { color: '#228B22', fillOpacity: 0.3 },
       name: 'Pesticides avec données',
       visible: true,
@@ -29,7 +29,7 @@ export class CarteComponent implements OnInit {
       useCustomMarkers: true  // ⬅️ AJOUT
     },
     {
-      url: 'assets/ecoli.geojson',
+      url: 'assets/ecoli_with_data2.geojson',
       style: { color: '#FF6347', weight: 3, fillOpacity: 0 },
       name: 'Bactérie Escherichia coli',
       visible: true,
@@ -150,7 +150,7 @@ export class CarteComponent implements OnInit {
             pointToLayer: (feature, latlng) => {
               // Marqueurs colorés pour pesticide_with_data
               if (layerConfig.useCustomMarkers) {
-                const valeur = feature.properties?.moyenne_Valeur_moy;
+                const valeur = feature.properties?.['Moyenne micropolluants OH — Feuil1_Valeur_moy'];
                 let markerColor = '#00ff00'; // Vert par défaut
 
                 if (valeur > 0.2) {
@@ -188,9 +188,9 @@ export class CarteComponent implements OnInit {
               if (layerConfig.interactive === false) return;
 
               if (feature.properties) {
-                // ⬇️ MODIFICATION ICI - Popup enrichie pour pesticide_with_data
-                if (layerConfig.useCustomMarkers && feature.properties['Moyenne micropolluants OH — Feuil1_Valeur_moy'] !== undefined) {
-                  const valeur = feature.properties['Moyenne micropolluants OH — Feuil1_Valeur_moy'];
+                // ⬇️ Popup enrichie pour pesticide_with_data
+                if (layerConfig.useCustomMarkers && feature.properties.moyenne_Valeur_moy !== undefined) {
+                  const valeur = feature.properties.moyenne_Valeur_moy;
                   let status = 'Bon';
                   let statusColor = '#00ff00';
 
@@ -210,7 +210,7 @@ export class CarteComponent implements OnInit {
                       </div>`;
 
                   for (let key in feature.properties) {
-                    if (key !== 'Moyenne micropolluants OH — Feuil1_Valeur_moy') {
+                    if (key !== 'moyenne_Valeur_moy') {
                       popupContent += `<p style="margin: 3px 0;"><b>${key}:</b> ${feature.properties[key]}</p>`;
                     }
                   }
@@ -299,4 +299,5 @@ export class CarteComponent implements OnInit {
     });
     L.Marker.prototype.options.icon = iconDefault;
   }
+
 }
