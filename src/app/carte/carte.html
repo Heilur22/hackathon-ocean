@@ -1,6 +1,10 @@
+<img src="assets/logo_hackathon.jpg" alt="Mon logo" width="150">
+<img src="assets/an_dour.png" alt="An dour" width="150">
+
 <div class="carte-container">
-  <!-- Panneau de contrôle des couches -->
-  <div class="layer-control">
+  <!-- La carte -->
+  <div id="map"></div>
+  <div class="layer-control mt-5">
     <h3>Couches de données</h3>
     <div class="layer-item" *ngFor="let layer of layers">
       <label class="checkbox-label">
@@ -14,7 +18,4 @@
       </label>
     </div>
   </div>
-
-  <!-- La carte -->
-  <div id="map"></div>
 </div>
