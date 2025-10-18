@@ -25,3 +25,51 @@ h1 {
   color: #666;
   font-style: italic;
 }
+
+.logo {
+  width: 140px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* --- Carte + panneau --- */
+.carte-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* --- Panneau de couches --- */
+.layer-control {
+  flex: 0 0 300px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.layer-indicator {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+}
+
+.checkbox-label {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.checkbox-label:hover {
+  background-color: #f8f9fa;
+}

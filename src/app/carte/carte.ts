@@ -59,7 +59,7 @@ export class CarteComponent implements OnInit {
       },
       name: 'Zone baie de morlaix',
       visible: true,
-      color: '#3388ff',
+      color: '#3388ff'
     },
     {
       url: 'assets/zone_locquirec.geojson',
@@ -114,6 +114,7 @@ export class CarteComponent implements OnInit {
       name: 'Zone d\'étude',
       visible: true,
       color: '#3388ff',
+      interactive: false
     }
   ];
 
@@ -146,72 +147,46 @@ export class CarteComponent implements OnInit {
           // Créer la couche GeoJSON directement
           const layer = L.geoJSON(data, {
             style: (feature) => {
-              // Si style est une fonction, l'appeler avec feature
               if (typeof layerConfig.style === 'function') {
                 return layerConfig.style(feature);
               }
-              // Sinon retourner l'objet style directement
               return layerConfig.style as any;
             },
-            pointToLayer: (feature, latlng) => {
-              // Uniquement pour les Points
-              return L.marker(latlng);
-            },
+            pointToLayer: (feature, latlng) => L.marker(latlng),
+
+            // ✅ Désactive toute interaction si demandé
+            interactive: layerConfig.interactive !== false,
+
             onEachFeature: (feature, layer: any) => {
+              // 🚫 Ne fait rien si la couche n’est pas interactive
+              if (layerConfig.interactive === false) return;
+
               if (feature.properties) {
-                // Popup spécifique pour les zones avec classification
-                if (feature.properties.CLASS_2023) {
-                  const classValue = feature.properties.CLASS_2023;
-                  const classLabels: any = {
-                    'A': { label: 'Excellente qualité', color: '#87CEEB' },
-                    'B': { label: 'Bonne qualité', color: '#00ff00' },
-                    'C': { label: 'Qualité moyenne', color: '#ffff00' },
-                    'N': { label: 'Non conforme', color: '#ff0000' }
-                  };
-
-                  const classInfo = classLabels[classValue] || { label: 'Non classé', color: '#ff0000' };
-
-                  let popupContent = `
-                    <div style="font-family: Arial; min-width: 200px;">
-                      <h3 style="margin: 0 0 10px 0; color: ${classInfo.color};">
-                        ${layerConfig.name}
-                      </h3>
-                      <div style="background: ${classInfo.color}; color: #000; padding: 5px 10px; border-radius: 3px; margin-bottom: 10px; font-weight: bold;">
-                        Classe ${classValue}: ${classInfo.label}
-                      </div>`;
-
-                  for (let key in feature.properties) {
-                    if (key !== 'CLASS_2023') {
-                      popupContent += `<p style="margin: 3px 0;"><b>${key}:</b> ${feature.properties[key]}</p>`;
-                    }
-                  }
-                  popupContent += '</div>';
-                  layer.bindPopup(popupContent);
-                } else {
-                  // Popup standard
-                  let popupContent = `<div><h3>${layerConfig.name}</h3>`;
-                  for (let key in feature.properties) {
-                    popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
-                  }
-                  popupContent += '</div>';
-                  layer.bindPopup(popupContent);
+                // Popup standard
+                let popupContent = `<div><h3>${layerConfig.name}</h3>`;
+                for (let key in feature.properties) {
+                  popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
                 }
+                popupContent += '</div>';
+                layer.bindPopup(popupContent);
               }
 
-              // Ajouter interaction hover pour les polygones
-              if (feature.geometry.type === 'Polygon' ||
-                feature.geometry.type === 'MultiPolygon') {
-                // Sauvegarder le style original
-                const originalStyle = typeof layerConfig.style === 'function'
-                  ? layerConfig.style(feature)
-                  : layerConfig.style;
+              // Effet hover uniquement si interactif
+              if (
+                (feature.geometry.type === 'Polygon' ||
+                  feature.geometry.type === 'MultiPolygon')
+              ) {
+                const originalStyle =
+                  typeof layerConfig.style === 'function'
+                    ? layerConfig.style(feature)
+                    : layerConfig.style;
 
                 layer.on('mouseover', (e: any) => {
                   e.target.setStyle({
                     weight: 4,
                     fillOpacity: 0.8,
                     color: originalStyle.color,
-                    fillColor: originalStyle.fillColor
+                    fillColor: originalStyle.fillColor,
                   });
                 });
 
@@ -219,7 +194,7 @@ export class CarteComponent implements OnInit {
                   e.target.setStyle(originalStyle);
                 });
               }
-            }
+            },
           });
 
           // Stocker la référence de la couche GeoJSON

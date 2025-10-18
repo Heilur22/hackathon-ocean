@@ -5,4 +5,5 @@ export interface LayerConfig {
   visible: boolean;
   color: string;
   layer?: L.Layer;
+  interactive?: boolean;
 }
