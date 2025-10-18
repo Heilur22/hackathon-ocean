@@ -16,7 +16,18 @@
   <div class="carte-container d-flex flex-column flex-lg-row gap-4">
     <!-- Carte -->
     <div id="map"></div>
-
+    <div class="legends-container" *ngIf="activeLegends.length > 0">
+      <div class="legend-card" *ngFor="let legend of activeLegends">
+        <h4>{{ legend.name }}</h4>
+        <div class="legend-item" *ngFor="let item of legend.items">
+          <span class="legend-color" [style.background-color]="item.color"></span>
+          <div class="legend-text">
+            <span class="legend-label">{{ item.label }}</span>
+            <span class="legend-range">{{ item.range }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Contrôles -->
     <div class="layer-control card shadow-sm p-3">
       <h3 class="mb-3 text-primary fw-bold">Couches de données</h3>

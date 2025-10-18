@@ -231,3 +231,70 @@ footer {
   border: 2px solid #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
+
+/* Conteneur des légendes */
+.legends-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 0 0 280px;
+}
+
+.legend-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.legend-card h4 {
+  margin: 0 0 12px 0;
+  color: #0288d1;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 2px solid #e1f5fe;
+  padding-bottom: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.legend-item:hover {
+  background-color: #e1f5fe;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.legend-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.legend-label {
+  font-weight: 600;
+  color: #01579b;
+  font-size: 0.9rem;
+}
+
+.legend-range {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+}

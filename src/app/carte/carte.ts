@@ -114,6 +114,8 @@ export class CarteComponent implements OnInit {
     }
   ];
 
+  activeLegends: Array<{name: string, items: Array<{color: string, label: string, range: string}>}> = [];
+
   ngOnInit(): void {
     setTimeout(() => {
       this.fixLeafletIcons();
@@ -354,6 +356,8 @@ export class CarteComponent implements OnInit {
       this.map.removeLayer(layerConfig.layer);
       console.log(`🚫 Masquage de ${layerConfig.name}`);
     }
+
+    this.updateLegends(); // ⬅️ AJOUT
   }
 
   private fixLeafletIcons(): void {
@@ -372,6 +376,38 @@ export class CarteComponent implements OnInit {
       shadowSize: [41, 41]
     });
     L.Marker.prototype.options.icon = iconDefault;
+  }
+
+  private updateLegends(): void {
+    this.activeLegends = [];
+
+    this.layers.forEach(layer => {
+      if (layer.visible && layer.useCustomMarkers) {
+        if (layer.url.includes('pesticide')) {
+          this.activeLegends.push({
+            name: 'Pesticides',
+            items: [
+              { color: '#00ff00', label: 'Bon', range: '≤ 0.05 µg/L' },
+              { color: '#ffff00', label: 'Attention', range: '0.05 - 0.2 µg/L' },
+              { color: '#ff0000', label: 'Critique', range: '> 0.2 µg/L' }
+            ]
+          });
+        }
+
+        if (layer.url.includes('ecoli')) {
+          this.activeLegends.push({
+            name: 'E. coli',
+            items: [
+              { color: '#00ff00', label: 'Excellente', range: '0 - 500' },
+              { color: '#ffff00', label: 'Moyenne', range: '500 - 5 000' },
+              { color: '#FFA500', label: 'Médiocre', range: '5 000 - 50 000' },
+              { color: '#ff0000', label: 'Mauvaise', range: '50 000 - 100 000' },
+              { color: '#8B0000', label: 'Très mauvaise', range: '> 100 000 UFC/100mL' }
+            ]
+          });
+        }
+      }
+    });
   }
 
 }
