@@ -497,3 +497,83 @@ footer p {
   color: #666;
   font-style: italic;
 }
+/* Bannière avec texte blanc */
+.hero-section .overlay {
+  background: linear-gradient(135deg, rgba(0, 105, 148, 0.75) 0%, rgba(1, 87, 155, 0.65) 100%);
+  color: white; /* Déjà présent mais on s'assure */
+  text-align: center;
+  padding: 40px 50px;
+  border-radius: 15px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Logos dans la bannière */
+.hero-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.hero-logo {
+  width: 180px;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 3px solid rgba(255,255,255,0.9);
+  background: white;
+  padding: 8px;
+}
+
+.hero-logo:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+  border-color: #00bcd4;
+}
+
+/* Texte de la bannière en blanc */
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  letter-spacing: 0.5px;
+  color: white; /* Explicitement blanc */
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  font-style: italic;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+  font-weight: 300;
+  color: white; /* Explicitement blanc */
+}
+
+/* Responsive pour la bannière */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 300px;
+    background-attachment: scroll;
+  }
+
+  .hero-section h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-section .overlay {
+    padding: 25px 20px;
+  }
+
+  .hero-logos {
+    gap: 20px;
+  }
+
+  .hero-logo {
+    width: 120px;
+  }
+}
