@@ -2,21 +2,41 @@ import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 import {HttpClient} from '@angular/common/http';
 import {LayerConfig} from './layer-config';
+import {FormsModule} from '@angular/forms';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-carte',
   standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: 'carte.html',
   styleUrl: './carte.css'
 })
 export class CarteComponent implements OnInit {
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
+
   private map: any;
 
+  // Configuration des couches avec visibilité
+  layers: LayerConfig[] = [
+    {
+      url: 'assets/pesticide.geojson',
+      style: { color: '#228B22', fillOpacity: 0.3 },
+      name: 'Pesticides',
+      visible: true,
+      color: '#228B22'
+    },
+    {
+      url: 'assets/ecoli.geojson',
+      style: { color: '#FF6347', weight: 3, fillOpacity: 0 },
+      name: 'Bactérie Escherichia coli',
+      visible: true,
+      color: '#FF6347'
+    }
+  ];
+
   ngOnInit(): void {
-    // Petit délai pour s'assurer que le DOM est prêt
     setTimeout(() => {
       this.fixLeafletIcons();
       this.initMap();
@@ -25,18 +45,13 @@ export class CarteComponent implements OnInit {
   }
 
   private initMap(): void {
-    // Initialiser la carte
     this.map = L.map('map');
 
-    // Définir les coordonnées de Roscoff et Locquirec
     const roscoff: L.LatLngTuple = [48.7267, -3.9883];
     const locquirec: L.LatLngTuple = [48.6869, -3.6469];
-
-    // Zoomer sur la zone entre Roscoff et Locquirec
     const bounds = L.latLngBounds(roscoff, locquirec);
     this.map.fitBounds(bounds, { padding: [50, 50] });
 
-    // Ajouter le fond de carte OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors'
@@ -44,25 +59,23 @@ export class CarteComponent implements OnInit {
   }
 
   private loadGeoJSON(): void {
-    // Liste des fichiers GeoJSON à charger
-    const geoJsonFiles = [
-      { url: 'assets/pesticide.geojson', style: { color: '#228B22', fillOpacity: 0.3 }, name: 'Pesticides' },
-      { url: 'assets/ecoli.geojson', style: { color: '#FF6347', weight: 3, fillOpacity: 0 }, name: 'Bactérie Escherichia coli' },
-    ];
-
-    // Charger chaque fichier
-    geoJsonFiles.forEach(file => {
-      this.http.get(file.url).subscribe({
+    this.layers.forEach(layerConfig => {
+      this.http.get(layerConfig.url).subscribe({
         next: (data: any) => {
+          // Créer un LayerGroup pour contenir tous les marqueurs
+          const layerGroup = L.layerGroup();
+
           const layer = L.geoJSON(data, {
-            style: () => file.style,
+            style: () => layerConfig.style,
             pointToLayer: (feature, latlng) => {
-              // Crée un marker classique pour chaque Point
-              return L.marker(latlng);
+              const marker = L.marker(latlng);
+              // Ajouter chaque marqueur au LayerGroup
+              marker.addTo(layerGroup);
+              return marker;
             },
             onEachFeature: (feature, layer) => {
               if (feature.properties) {
-                let popupContent = `<div><h3>${file.name}</h3>`;
+                let popupContent = `<div><h3>${layerConfig.name}</h3>`;
                 for (let key in feature.properties) {
                   popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
                 }
@@ -70,28 +83,41 @@ export class CarteComponent implements OnInit {
                 layer.bindPopup(popupContent);
               }
             }
-          }).addTo(this.map);
+          });
 
-          console.log(`✅ ${file.name} chargé avec succès`);
+          // Stocker la référence du LayerGroup (pas la couche GeoJSON)
+          layerConfig.layer = layerGroup as any;
+
+          // Ajouter à la carte si visible
+          if (layerConfig.visible) {
+            layerGroup.addTo(this.map);
+          }
+
+          console.log(`✅ ${layerConfig.name} chargé avec succès (${layerGroup.getLayers().length} marqueurs)`);
         },
         error: (error) => {
-          console.error(`❌ Erreur lors du chargement de ${file.name}:`, error);
+          console.error(`❌ Erreur lors du chargement de ${layerConfig.name}:`, error);
         }
       });
     });
   }
 
+  // Méthode pour afficher/masquer une couche
   toggleLayer(layerConfig: LayerConfig): void {
-    if (!layerConfig.layer) return;
+    if (!layerConfig.layer) {
+      console.warn(`⚠️ Couche ${layerConfig.name} pas encore chargée`);
+      return;
+    }
 
     if (layerConfig.visible) {
-      layerConfig.layer.addTo(this.map);
+      this.map.addLayer(layerConfig.layer);
+      console.log(`👁️ Affichage de ${layerConfig.name}`);
     } else {
       this.map.removeLayer(layerConfig.layer);
+      console.log(`🚫 Masquage de ${layerConfig.name}`);
     }
   }
 
-  // Fix pour les icônes Leaflet dans Angular
   private fixLeafletIcons(): void {
     (L.Icon.Default as any).imagePath = 'assets/';
     const iconRetinaUrl = 'assets/marker-icon-2x.png';

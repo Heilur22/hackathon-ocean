@@ -1,7 +1,20 @@
 <div class="carte-container">
-  <h1>🗺️ Indicateurs de qualité des eaux</h1>
-  <div id="map"></div>
-  <div class="info">
-    <p>Cliquez sur les marqueurs pour plus d'informations</p>
+  <!-- Panneau de contrôle des couches -->
+  <div class="layer-control">
+    <h3>Couches de données</h3>
+    <div class="layer-item" *ngFor="let layer of layers">
+      <label class="checkbox-label">
+        <input
+          type="checkbox"
+          [(ngModel)]="layer.visible"
+          (change)="toggleLayer(layer)"
+        />
+        <span class="layer-indicator" [style.background-color]="layer.color"></span>
+        <span class="layer-name">{{ layer.name }}</span>
+      </label>
+    </div>
   </div>
+
+  <!-- La carte -->
+  <div id="map"></div>
 </div>
