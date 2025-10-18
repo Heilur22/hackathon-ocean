@@ -1,8 +1,8 @@
 export interface LayerConfig {
   url: string;
-  style: any;
+  style: any | ((feature: any) => any);  // ⬅️ Peut être un objet OU une fonction
   name: string;
   visible: boolean;
-  layer?: L.GeoJSON;
   color: string;
+  layer?: L.Layer;
 }

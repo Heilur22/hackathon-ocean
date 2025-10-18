@@ -33,6 +33,87 @@ export class CarteComponent implements OnInit {
       name: 'Bactérie Escherichia coli',
       visible: true,
       color: '#FF6347'
+    },
+    {
+      url: 'assets/zone_morlaix.geojson',
+      // ⬇️ CHANGEMENT ICI : fonction au lieu d'objet
+      style: (feature: any) => {
+        // Couleur basée sur CLASS_2023
+        const classValue = feature?.properties?.CLASS_2023;
+        let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
+
+        if (classValue === 'A') {
+          fillColor = '#007FFF'; // Bleu ciel
+        } else if (classValue === 'B') {
+          fillColor = '#00ff00'; // Vert
+        } else if (classValue === 'C') {
+          fillColor = '#ffff00'; // Jaune
+        }
+
+        return {
+          color: fillColor,        // Couleur du contour
+          weight: 2,               // Épaisseur du contour
+          fillColor: fillColor,    // Couleur de remplissage
+          fillOpacity: 0.5         // Opacité du remplissage
+        };
+      },
+      name: 'Zone baie de morlaix',
+      visible: true,
+      color: '#3388ff',
+    },
+    {
+      url: 'assets/zone_locquirec.geojson',
+      // ⬇️ CHANGEMENT ICI : fonction au lieu d'objet
+      style: (feature: any) => {
+        // Couleur basée sur CLASS_2023
+        const classValue = feature?.properties?.GP2_2023;
+        let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
+
+        if (classValue === 'A') {
+          fillColor = '#007FFF'; // Bleu ciel
+        } else if (classValue === 'B') {
+          fillColor = '#00ff00'; // Vert
+        } else if (classValue === 'C') {
+          fillColor = '#ffff00'; // Jaune
+        }
+
+        return {
+          color: fillColor,        // Couleur du contour
+          weight: 2,               // Épaisseur du contour
+          fillColor: fillColor,    // Couleur de remplissage
+          fillOpacity: 0.5         // Opacité du remplissage
+        };
+      },
+      name: 'Zone Locquirec',
+      visible: true,
+      color: '#3388ff',
+    },
+    {
+      url: 'assets/zone_etude.geojson',
+      // ⬇️ CHANGEMENT ICI : fonction au lieu d'objet
+      style: (feature: any) => {
+        // Couleur basée sur CLASS_2023
+        const classValue = feature?.properties?.GP2_2023;
+        let fillColor = '#ff0000'; // Rouge par défaut (N ou absence)
+
+        if (classValue === 'A') {
+          fillColor = '#007FFF'; // Bleu ciel
+        } else if (classValue === 'B') {
+          fillColor = '#00ff00'; // Vert
+        } else if (classValue === 'C') {
+          fillColor = '#ffff00'; // Jaune
+        }
+
+        return {
+          color: fillColor,        // Couleur du contour
+          weight: 2,               // Épaisseur du contour
+          fillColor: fillColor,    // Couleur de remplissage
+          fillOpacity: 0         // Opacité du remplissage
+        };
+      },
+      name: 'Zone d\'étude',
+      visible: true,
+      color: '#3388ff',
     }
   ];
 
@@ -62,38 +143,94 @@ export class CarteComponent implements OnInit {
     this.layers.forEach(layerConfig => {
       this.http.get(layerConfig.url).subscribe({
         next: (data: any) => {
-          // Créer un LayerGroup pour contenir tous les marqueurs
-          const layerGroup = L.layerGroup();
-
+          // Créer la couche GeoJSON directement
           const layer = L.geoJSON(data, {
-            style: () => layerConfig.style,
-            pointToLayer: (feature, latlng) => {
-              const marker = L.marker(latlng);
-              // Ajouter chaque marqueur au LayerGroup
-              marker.addTo(layerGroup);
-              return marker;
+            style: (feature) => {
+              // Si style est une fonction, l'appeler avec feature
+              if (typeof layerConfig.style === 'function') {
+                return layerConfig.style(feature);
+              }
+              // Sinon retourner l'objet style directement
+              return layerConfig.style as any;
             },
-            onEachFeature: (feature, layer) => {
+            pointToLayer: (feature, latlng) => {
+              // Uniquement pour les Points
+              return L.marker(latlng);
+            },
+            onEachFeature: (feature, layer: any) => {
               if (feature.properties) {
-                let popupContent = `<div><h3>${layerConfig.name}</h3>`;
-                for (let key in feature.properties) {
-                  popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                // Popup spécifique pour les zones avec classification
+                if (feature.properties.CLASS_2023) {
+                  const classValue = feature.properties.CLASS_2023;
+                  const classLabels: any = {
+                    'A': { label: 'Excellente qualité', color: '#87CEEB' },
+                    'B': { label: 'Bonne qualité', color: '#00ff00' },
+                    'C': { label: 'Qualité moyenne', color: '#ffff00' },
+                    'N': { label: 'Non conforme', color: '#ff0000' }
+                  };
+
+                  const classInfo = classLabels[classValue] || { label: 'Non classé', color: '#ff0000' };
+
+                  let popupContent = `
+                    <div style="font-family: Arial; min-width: 200px;">
+                      <h3 style="margin: 0 0 10px 0; color: ${classInfo.color};">
+                        ${layerConfig.name}
+                      </h3>
+                      <div style="background: ${classInfo.color}; color: #000; padding: 5px 10px; border-radius: 3px; margin-bottom: 10px; font-weight: bold;">
+                        Classe ${classValue}: ${classInfo.label}
+                      </div>`;
+
+                  for (let key in feature.properties) {
+                    if (key !== 'CLASS_2023') {
+                      popupContent += `<p style="margin: 3px 0;"><b>${key}:</b> ${feature.properties[key]}</p>`;
+                    }
+                  }
+                  popupContent += '</div>';
+                  layer.bindPopup(popupContent);
+                } else {
+                  // Popup standard
+                  let popupContent = `<div><h3>${layerConfig.name}</h3>`;
+                  for (let key in feature.properties) {
+                    popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                  }
+                  popupContent += '</div>';
+                  layer.bindPopup(popupContent);
                 }
-                popupContent += '</div>';
-                layer.bindPopup(popupContent);
+              }
+
+              // Ajouter interaction hover pour les polygones
+              if (feature.geometry.type === 'Polygon' ||
+                feature.geometry.type === 'MultiPolygon') {
+                // Sauvegarder le style original
+                const originalStyle = typeof layerConfig.style === 'function'
+                  ? layerConfig.style(feature)
+                  : layerConfig.style;
+
+                layer.on('mouseover', (e: any) => {
+                  e.target.setStyle({
+                    weight: 4,
+                    fillOpacity: 0.8,
+                    color: originalStyle.color,
+                    fillColor: originalStyle.fillColor
+                  });
+                });
+
+                layer.on('mouseout', (e: any) => {
+                  e.target.setStyle(originalStyle);
+                });
               }
             }
           });
 
-          // Stocker la référence du LayerGroup (pas la couche GeoJSON)
-          layerConfig.layer = layerGroup as any;
+          // Stocker la référence de la couche GeoJSON
+          layerConfig.layer = layer as any;
 
           // Ajouter à la carte si visible
           if (layerConfig.visible) {
-            layerGroup.addTo(this.map);
+            layer.addTo(this.map);
           }
 
-          console.log(`✅ ${layerConfig.name} chargé avec succès (${layerGroup.getLayers().length} marqueurs)`);
+          console.log(`✅ ${layerConfig.name} chargé avec succès`);
         },
         error: (error) => {
           console.error(`❌ Erreur lors du chargement de ${layerConfig.name}:`, error);
