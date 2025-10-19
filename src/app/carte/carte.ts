@@ -32,7 +32,7 @@ export class CarteComponent implements OnInit {
       url: 'assets/ecoli_with_data2.geojson',
       style: { color: '#FF6347', weight: 3, fillOpacity: 0 },
       name: 'Bactérie Escherichia coli',
-      visible: true,
+      visible: false,
       color: '#FF6347',
       useCustomMarkers: true  // ⬅️ AJOUT
     },
@@ -58,7 +58,7 @@ export class CarteComponent implements OnInit {
         };
       },
       name: 'Zone baie de morlaix',
-      visible: true,
+      visible: false,
       color: '#3388ff'
     },
     {
@@ -83,7 +83,7 @@ export class CarteComponent implements OnInit {
         };
       },
       name: 'Zone Locquirec',
-      visible: true,
+      visible: false,
       color: '#3388ff',
     },
     {
@@ -108,7 +108,7 @@ export class CarteComponent implements OnInit {
         };
       },
       name: 'Zone d\'étude',
-      visible: true,
+      visible: false,
       color: '#3388ff',
       interactive: false
     }
@@ -398,12 +398,12 @@ export class CarteComponent implements OnInit {
 
         if (layer.url.includes('ecoli')) {
           this.activeLegends.push({
-            name: 'E. coli',
+            name: 'Escherichia coli',
             items: [
-              { color: '#00ff00', label: 'Excellente', range: '0 - 500' },
-              { color: '#ffff00', label: 'Moyenne', range: '500 - 5 000' },
-              { color: '#FFA500', label: 'Médiocre', range: '5 000 - 50 000' },
-              { color: '#ff0000', label: 'Mauvaise', range: '50 000 - 100 000' },
+              { color: '#00ff00', label: 'Excellente', range: '0 - 500 UFC/100mL' },
+              { color: '#ffff00', label: 'Moyenne', range: '500 - 5 000 UFC/100mL' },
+              { color: '#FFA500', label: 'Médiocre', range: '5 000 - 50 000 UFC/100mL' },
+              { color: '#ff0000', label: 'Mauvaise', range: '50 000 - 100 000 UFC/100mL' },
               { color: '#8B0000', label: 'Très mauvaise', range: '> 100 000 UFC/100mL' }
             ]
           });
